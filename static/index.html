@@ -1,0 +1,595 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>FitMe - Demo</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      background: #fafafa;
+      color: #1a1a1a;
+      overflow-x: hidden;
+      font-weight: 300;
+    }
+
+    /* Subtle texture overlay */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background:
+        radial-gradient(circle at 15% 50%, rgba(0, 0, 0, 0.02) 0%, transparent 50%),
+        radial-gradient(circle at 85% 30%, rgba(0, 0, 0, 0.02) 0%, transparent 50%);
+      z-index: -1;
+    }
+
+    .container {
+      width: 95%;
+      max-width: 800px;
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 60px 50px;
+      text-align: center;
+      position: relative;
+      margin: 50px auto;
+      border: 1px solid #e8e8e8;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    /* === HEADER & TYPOGRAPHY === */
+    h1 {
+      font-size: 2.6rem;
+      font-weight: 300;
+      color: #1a1a1a;
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    h1::after {
+      content: "";
+      width: 80px;
+      height: 1px;
+      display: block;
+      margin: 20px auto 0;
+      background: #1a1a1a;
+      opacity: 0.3;
+    }
+
+    /* === FORM STYLING === */
+    form {
+      max-width: 400px;
+      margin: 50px auto;
+      text-align: left;
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 40px;
+      border: 1px solid #f0f0f0;
+      transition: all 0.3s ease;
+    }
+
+    form:hover {
+      border-color: #d0d0d0;
+    }
+
+    form label {
+      display: block;
+      margin-top: 24px;
+      font-weight: 400;
+      color: #333;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 8px;
+    }
+
+    form select,
+    form input[type="text"] {
+      width: 100%;
+      padding: 14px 16px;
+      margin-top: 4px;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      font-size: 15px;
+      background: #ffffff;
+      color: #333;
+      transition: all 0.3s ease;
+      font-family: inherit;
+      font-weight: 300;
+    }
+
+    form select:focus,
+    form input[type="text"]:focus {
+      outline: none;
+      border-color: #1a1a1a;
+      background: #ffffff;
+    }
+
+    input[type="checkbox"] {
+      accent-color: #1a1a1a;
+      transform: scale(1.1);
+      margin-right: 10px;
+    }
+
+    /* === BUTTON === */
+    button {
+      margin-top: 35px;
+      padding: 16px 40px;
+      background: #1a1a1a;
+      border: 1px solid #1a1a1a;
+      border-radius: 6px;
+      color: white;
+      font-weight: 400;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      width: 100%;
+    }
+
+    button:hover {
+      background: #333;
+      transform: translateY(-1px);
+    }
+
+    /* === STATUS === */
+    .status {
+      margin-top: 25px;
+      color: #666;
+      text-align: center;
+      font-size: 14px;
+      font-style: italic;
+      font-weight: 300;
+    }
+
+    /* === RESULTS === */
+    .result {
+      margin-top: 60px;
+      text-align: center;
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    .result h2 {
+      font-size: 1.3rem;
+      font-weight: 400;
+      color: #1a1a1a;
+      margin-bottom: 30px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* === PRODUCT GRID === */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 25px;
+      margin-top: 35px;
+      justify-items: center;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 0;
+      width: 100%;
+      border: 1px solid #f0f0f0;
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      border-color: #d0d0d0;
+    }
+
+    .card img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover img {
+      transform: scale(1.02);
+    }
+
+    .card div {
+      padding: 20px 15px;
+      font-weight: 400;
+      font-size: 12px;
+      color: #333;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      border-top: 1px solid #f8f8f8;
+    }
+
+    /* === LOGO STYLING === */
+    .logo-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .logo {
+      max-width: 180px;
+      height: auto;
+      border-radius: 0;
+      object-fit: contain;
+      transition: transform 0.3s ease;
+    }
+
+    .logo:hover {
+      transform: scale(1.03);
+    }
+
+    /* === REFINED DETAILS === */
+    .container::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 2px;
+      background: #1a1a1a;
+      opacity: 0.1;
+    }
+
+    form::before {
+      content: "";
+      position: absolute;
+      top: -1px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 1px;
+      background: #1a1a1a;
+      opacity: 0.2;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="logo-container">
+      <img src="/static/fitme_logo.png" alt="FitMe Logo" class="logo" />
+    </div>
+    <form id="prefForm">
+      <label>Style (Gender)</label>
+      <select name="style" required>
+        <option>Male</option>
+        <option>Female</option>
+        <option>Unisex</option>
+      </select>
+
+      <label>Life Stage</label>
+      <select name="life_stage" required>
+        <option>child</option>
+        <option>teen</option>
+        <option>adult</option>
+        <option>senior</option>
+      </select>
+
+      <label>Occasion</label>
+      <select name="occasion" required>
+        <option>casual</option>
+        <option>formal</option>
+        <option>party</option>
+        <option>wedding</option>
+      </select>
+
+      <label>Price Range</label>
+      <select name="price_range">
+        <option>Below 1K</option>
+        <option>1K-2K</option>
+        <option>2K-5K</option>
+        <option>5K+</option>
+      </select>
+
+      <label>Season</label>
+      <select name="season">
+        <option>Summer</option>
+        <option>Winter</option>
+        <option>Spring</option>
+        <option>Autumn</option>
+      </select>
+
+      <label>
+        <input type="checkbox" name="unisex_preference" /> Prefer Unisex
+      </label>
+
+      <button type="submit" id="scanBtn">Start Scan</button>
+    </form>
+
+    <div id="status" class="status"></div>
+
+    <div id="result" class="result" hidden>
+      <h2>Scan Result</h2>
+      <pre id="scanJson"></pre>
+
+      <h2>Recommendations</h2>
+      <div id="recs" class="grid"></div>
+    </div>
+  </div>
+
+
+
+  <script>
+    // app.js - with camera functionality (FIXED VERSION)
+    const form = document.getElementById('prefForm');
+    const scanBtn = document.getElementById('scanBtn');
+    const status = document.getElementById('status');
+    const resultPane = document.getElementById('result');
+    const scanJson = document.getElementById('scanJson');
+    const recsDiv = document.getElementById('recs');
+
+    let stream = null;
+    let video = null;
+    let canvas = null;
+    let isCameraMode = false;
+
+    // Create camera elements dynamically
+    function createCameraElements() {
+      // Remove existing camera elements if any
+      const existingVideo = document.getElementById('cameraVideo');
+      const existingCanvas = document.getElementById('cameraCanvas');
+      const existingCaptureBtn = document.getElementById('captureBtn');
+
+      if (existingVideo) existingVideo.remove();
+      if (existingCanvas) existingCanvas.remove();
+      if (existingCaptureBtn) existingCaptureBtn.remove();
+
+      // Create video element for camera
+      video = document.createElement('video');
+      video.id = 'cameraVideo';
+      video.autoplay = true;
+      video.playsInline = true;
+      video.style.width = '100%';
+      video.style.maxWidth = '500px';
+      video.style.border = '2px solid #007bff';
+      video.style.borderRadius = '8px';
+      video.style.margin = '10px 0';
+
+      // Create canvas for capturing image
+      canvas = document.createElement('canvas');
+      canvas.id = 'cameraCanvas';
+      canvas.style.display = 'none';
+
+      // Create dedicated capture button
+      const captureBtn = document.createElement('button');
+      captureBtn.id = 'captureBtn';
+      captureBtn.textContent = 'Capture & Scan';
+      captureBtn.style.background = '#28a745';
+      captureBtn.type = 'button'; // Important: not submit
+
+      // Insert after the form
+      form.parentNode.insertBefore(video, form.nextSibling);
+      form.parentNode.insertBefore(canvas, video.nextSibling);
+      form.parentNode.insertBefore(captureBtn, canvas.nextSibling);
+
+      // Add capture button event listener
+      captureBtn.addEventListener('click', performScanWithCamera);
+    }
+
+    // Start camera
+    async function startCamera() {
+      try {
+        status.textContent = "Starting camera...";
+
+        createCameraElements();
+
+        // Get camera access
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: 'user', // Front camera
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          }
+        });
+
+        video.srcObject = stream;
+        status.textContent = "Camera ready! Click 'Capture & Scan' when ready.";
+        isCameraMode = true;
+
+      } catch (err) {
+        console.error("Camera error:", err);
+        status.textContent = "Camera error: " + err.message;
+        // Fallback: proceed without camera
+        await performScanWithoutCamera();
+      }
+    }
+
+    // Capture image from camera
+    function captureImage() {
+      if (!video || !canvas) return null;
+
+      const context = canvas.getContext('2d');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      // Convert to data URL (base64)
+      return canvas.toDataURL('image/jpeg', 0.8);
+    }
+
+    // Stop camera and cleanup
+    function stopCamera() {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+      }
+      if (video) {
+        video.srcObject = null;
+      }
+
+      // Remove camera elements
+      const cameraVideo = document.getElementById('cameraVideo');
+      const cameraCanvas = document.getElementById('cameraCanvas');
+      const captureBtn = document.getElementById('captureBtn');
+
+      if (cameraVideo) cameraVideo.remove();
+      if (cameraCanvas) cameraCanvas.remove();
+      if (captureBtn) captureBtn.remove();
+
+      isCameraMode = false;
+    }
+
+    // Perform scan with camera image
+    async function performScanWithCamera() {
+      console.log("Capture button clicked!");
+
+      const imageData = captureImage();
+
+      if (!imageData) {
+        status.textContent = "Failed to capture image. Proceeding without camera...";
+        await performScanWithoutCamera();
+        return;
+      }
+
+      // Build payload with image
+      const formData = new FormData(form);
+      const payload = {
+        style: formData.get('style'),
+        life_stage: formData.get('life_stage'),
+        occasion: formData.get('occasion'),
+        price_range: formData.get('price_range'),
+        season: formData.get('season'),
+        unisex_preference: formData.get('unisex_preference') === 'on',
+        image_data: imageData // Include captured image
+      };
+
+      await sendScanRequest(payload);
+    }
+
+    // Perform scan without camera (fallback)
+    async function performScanWithoutCamera() {
+      const formData = new FormData(form);
+      const payload = {
+        style: formData.get('style'),
+        life_stage: formData.get('life_stage'),
+        occasion: formData.get('occasion'),
+        price_range: formData.get('price_range'),
+        season: formData.get('season'),
+        unisex_preference: formData.get('unisex_preference') === 'on'
+      };
+
+      await sendScanRequest(payload);
+    }
+
+    // Send scan request to backend
+    async function sendScanRequest(payload) {
+      try {
+        status.textContent = "Sending data to server...";
+
+        console.log("Sending payload:", payload);
+
+        const res = await fetch('/scan/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(`Scan failed: ${res.status} ${errorData.detail || 'Unknown error'}`);
+        }
+
+        const data = await res.json();
+        handleScanResponse(data);
+
+      } catch (err) {
+        console.error(err);
+        status.textContent = `Error: ${err.message}`;
+      } finally {
+        scanBtn.disabled = false;
+        scanBtn.textContent = "Start Scan";
+        stopCamera();
+      }
+    }
+
+    // Handle scan response
+    function handleScanResponse(data) {
+      status.textContent = "Scan complete!";
+      scanJson.textContent = JSON.stringify(data, null, 2);
+      resultPane.hidden = false;
+
+      // Show success message
+      if (data.status === "success") {
+        status.textContent = "✅ " + (data.message || "Scan completed successfully!");
+      }
+
+      // Show recommendations if available
+      if (data.data && data.data.recommendations) {
+        recsDiv.innerHTML = data.data.recommendations.map(item => `
+            <div class="card">
+                <img src="${item.image_url || 'https://via.placeholder.com/300'}" alt="${escapeHtml(item.title || 'Item')}"/>
+                <div style="padding-top:8px;font-weight:600">${escapeHtml(item.title || 'Item')}</div>
+            </div>
+        `).join('');
+      }
+    }
+
+    // Form submit handler - only for initial camera start
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      if (isCameraMode) {
+        // If already in camera mode, ignore form submit
+        return;
+      }
+
+      resultPane.hidden = true;
+      recsDiv.innerHTML = '';
+      scanBtn.disabled = true;
+
+      // Start camera and wait for user to capture
+      await startCamera();
+    });
+
+    // Escape HTML function
+    function escapeHtml(s) {
+      return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+
+    // Add some debug logging
+    console.log("FitMe frontend loaded successfully!");
+  </script>
+
+
+
+</body>
+
+</html>
